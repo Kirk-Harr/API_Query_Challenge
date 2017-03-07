@@ -1,0 +1,20 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.mindbeta.javachallenge</groupId>
+    <artifactId>api-query-challenge</artifactId>
+    <version>1</version>
+    <developers>
+        <developer>
+            <id>kharr</id>
+            <name>Kirk Harr</name>
+            <email>daehlie@gmail.com</email>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>com.eclipsesource.minimal-json</groupId>
+            <artifactId>minimal-json</artifactId>
+            <version>0.9.4</version>
+        </dependency>
+    </dependencies>
+</project>

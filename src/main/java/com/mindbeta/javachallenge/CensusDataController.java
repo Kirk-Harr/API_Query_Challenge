@@ -3,6 +3,9 @@ package com.mindbeta.javachallenge;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+
+import java.util.Collections;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.json.JSONArray;
@@ -16,8 +19,6 @@ import org.json.JSONObject;
  */
 public class CensusDataController
 {
-    // Set static User-Agent for all connections.
-    private final String USER_AGENT = "Mozilla/5.0";
     /**
      * Gather demographic data for a list of US states from the US Census data for those states and displaying an aggregate output of that data. Format options include a weighted average for income distribution below poverty of all the states, and CSV output for all states individually.
      * @param args comma-delimited list of US States followed by 'CSV' for CSV output and 'averages' for the weighted-average income below poverty output.
@@ -31,9 +32,23 @@ public class CensusDataController
      * @param stateName the name of the state to lookup for it's US Census FIPS ID.
      * @return US Census FIPS ID for the state.
      */
-    public Integer StateIdLookup( String stateName ) {
+    private Integer StateIdLookup( String stateName ) {
         // URL of Census Data API with proper request options.
         String url = "https://www.broadbandmap.gov/broadbandmap/census/state/" + stateName + "?maxresults=1&all=false&format=json";
+        // Get JSON output from request.
+        StringBuffer response = retrieveJSON(url);
+        // Unboxing the JSON data structure.
+        JSONObject fullOutput = new JSONObject(response.toString());
+        JSONObject results = fullOutput.getJSONObject("Results");
+        JSONArray stateDataArray = results.getJSONArray("state");
+        JSONObject stateData = (JSONObject) stateDataArray.get(0);
+        // Return just the FIPS ID.
+        return Integer.valueOf((String)stateData.get("fips"));
+    }
+
+    private static StringBuffer retrieveJSON (String url) {
+        // Set static User-Agent for all connections.
+        String USER_AGENT = "Mozilla/5.0";
         StringBuffer response = new StringBuffer();
         try {
             URL apiRequest = new URL(url);
@@ -59,14 +74,7 @@ public class CensusDataController
         catch (Exception e) {
             e.printStackTrace();
         }
-        // Unboxing the JSON data structure.
-        JSONObject fullOutput = new JSONObject(response.toString());
-        JSONObject results = fullOutput.getJSONObject("Results");
-        JSONArray stateDataArray = results.getJSONArray("state");
-        JSONObject stateData = (JSONObject) stateDataArray.get(0);
-        // Return just the FIPS ID.
-        Integer returnInt = Integer.valueOf((String)stateData.get("fips"));
-        return returnInt;
+        return response;
     }
 
     /**
@@ -74,8 +82,27 @@ public class CensusDataController
      *
      * @param fipsIds US Census FIPS IDs for the states.
      */
-    public void StateDataOutput ( int[] fipsIds ) {
-
+    private void StateDataOutput ( String[] fipsIds ) {
+        double[] povertyIncomeValues = new double[fipsIds.length];
+        for( int id = 0; id < fipsIds.length; id++){
+            // URL of Census Data API with proper request options.
+            String url = "https://www.broadbandmap.gov/broadbandmap/demographic/jun2014/state/ids/" + fipsIds[id] + "?format=json";
+            // Get JSON output from request.
+            StringBuffer response = retrieveJSON(url);
+            // Unboxing the JSON data structure.
+            JSONObject fullOutput = new JSONObject(response.toString());
+            JSONArray results = fullOutput.getJSONArray("Results");
+            JSONObject stateData = (JSONObject) results.get(0);
+            povertyIncomeValues[id] = (Double) stateData.get("incomeBelowPoverty");
+        }
+        // Compute average of income below poverty values.
+        double runningTotal = 0.0;
+        for (double value: povertyIncomeValues){
+            runningTotal += value;
+        }
+        double average = runningTotal / fipsIds.length;
+        // Output Average
+        System.out.println(average);
     }
 
     /**
@@ -83,7 +110,31 @@ public class CensusDataController
      *
      * @param fipsIds US Census FIPS IDs for the states.
      */
-    public void StateCSVOutput ( int[] fipsIds ) {
-
+    private void StateCSVOutput ( String[] fipsIds ) {
+        ArrayList<String> stateCSVData = new ArrayList<String>();
+        for( String id : fipsIds) {
+            // URL of Census Data API with proper request options.
+            String url = "https://www.broadbandmap.gov/broadbandmap/demographic/jun2014/state/ids/" + id + "?format=json";
+            // Get JSON output from request.
+            StringBuffer response = retrieveJSON(url);
+            // Unboxing the JSON data structure.
+            JSONObject fullOutput = new JSONObject(response.toString());
+            JSONArray results = fullOutput.getJSONArray("Results");
+            JSONObject stateData = (JSONObject) results.get(0);
+            // Create each line of the CSV with the proper values included.
+            String csvLine = "";
+            csvLine = csvLine.concat(stateData.getString("geographyName") + ", ");
+            csvLine = csvLine.concat(stateData.get("population") + ", ");
+            csvLine = csvLine.concat(stateData.get("households") + ", ");
+            csvLine = csvLine.concat(stateData.get("incomeBelowPoverty") + ", ");
+            csvLine = csvLine.concat(stateData.get("medianIncome").toString());
+            stateCSVData.add(csvLine);
+        }
+        // Sort the resulting ArrayList by state name alphabetically.
+        Collections.sort(stateCSVData);
+        // Output sorted ArrayList.
+        for (String s : stateCSVData){
+            System.out.println(s);
+        }
     }
 }

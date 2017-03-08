@@ -107,6 +107,7 @@ public class CensusDataController
      */
     private void StateDataOutput ( String[] fipsIds ) {
         double[] povertyIncomeValues = new double[fipsIds.length];
+        int[] populationValues = new int[fipsIds.length];
         for( int id = 0; id < fipsIds.length; id++){
             // URL of Census Data API with proper request options.
             String url = "https://www.broadbandmap.gov/broadbandmap/demographic/jun2014/state/ids/" + fipsIds[id] + "?format=json";
@@ -117,15 +118,20 @@ public class CensusDataController
             JSONArray results = fullOutput.getJSONArray("Results");
             JSONObject stateData = (JSONObject) results.get(0);
             povertyIncomeValues[id] = (Double) stateData.get("incomeBelowPoverty");
+            populationValues[id] = (Integer) stateData.get("population");
         }
-        // Compute average of income below poverty values.
+        // Compute total population.
+        int totalPopulation = 0;
+        for (int pop : populationValues) {
+            totalPopulation += pop;
+        }
+        // Compute population-weighted average of income below poverty values.
         double runningTotal = 0.0;
-        for (double value: povertyIncomeValues){
-            runningTotal += value;
+        for (int id = 0; id < povertyIncomeValues.length; id++){
+            runningTotal += (((povertyIncomeValues[id] * populationValues[id]) * populationValues[id]) / totalPopulation);
         }
-        double average = runningTotal / fipsIds.length;
         // Output Average
-        System.out.println(average);
+        System.out.println(new Double(runningTotal).intValue());
     }
 
     /**

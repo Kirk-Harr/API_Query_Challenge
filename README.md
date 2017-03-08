@@ -1,13 +1,15 @@
 # State Census Data API Query Challenge
 
-#### Description: ####
+#### Description:
 The CensusDataController class is an API query tool to gather US Census data for a list of states and format the data for output. This output will either provide an aggregate average of the percentage of the population of those states below the poverty line, or provide a CSV table of the data gathered for each state. 
-#### Building: ####
+
+#### Building:
 This application is built using Maven, and once you have cloned the repository, you can build the application with the command:  
 `mvn clean package`  
 
-Once the application is built there will be an api-query-challenge.jar file in the target directory containing the application and any dependencies.
-#### Usage: ####  
+Once the application is built there will be an api-query-challenge.jar file in the target directory containing the application and any dependencies.  
+
+### Usage:
 `java -cp <builtJarPackage> com.mindbeta.javachallenge.CensusDataController <commaDelimitedStateList> <outputFormat>`  
 
 The list of states is all the states to gather the demographic data for, e.g. `alaska,ohio,texas`
@@ -16,8 +18,9 @@ The two options for outputFormat are: CSV, averages
   
 * CSV output will provide all state demographic data in CSV format sorted alphabetically by state name.  
 Example: `<state name>, <population>, <households>, <income below poverty>, <median income>`
-* averages output will provide the weighted average of each state's population below the poverty line. 
-#### Assumptions: ####
+* averages output will provide the weighted average of each state's population below the poverty line.  
+
+#### Assumptions: 
 Java version 8 was used for this project.
 
 For the weighted average output, each state had their average number of people in poverty calculated by multiplying the percentage of the population below poverty by total state population. This number of people in poverty in each state is then multiplied by the proportion of the total state population divided by the total population of all states being analyzed. Once completed for each state these values are summed and then returned as an integer value to give the population-weighted average number of people in poverty in all the states provided in the list. 

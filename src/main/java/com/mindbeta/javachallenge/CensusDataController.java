@@ -26,10 +26,13 @@ public class CensusDataController
     public static void main( String[] args ) {
         // Gather input from command line parameters.
         CensusDataController ctl = new CensusDataController();
+        // Split states by comma delimiter.
         String[] states = args[0].split(",");
         ArrayList<String> stateIds = new ArrayList<String>();
         // Lookup all state FIPS IDs.
         for (String s : states){
+            // Replace any spaces with the URL-friendly space character.
+            s = s.replace(" ", "%20");
             stateIds.add(ctl.StateIdLookup(s));
         }
         String[] stringArray = stateIds.toArray(new String[stateIds.size()]);

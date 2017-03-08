@@ -16,9 +16,11 @@ The two options for outputFormat are: CSV, averages
   
 * CSV output will provide all state demographic data in CSV format sorted alphabetically by state name.  
 Example: `<state name>, <population>, <households>, <income below poverty>, <median income>`
-* averages output will provide the weighted average of all the states percentage of the population below the poverty line. 
+* averages output will provide the weighted average of each state's population below the poverty line. 
 #### Assumptions: ####
 Java version 8 was used for this project.
+
+For the weighted average output, each state had their average number of people in poverty calculated by multiplying the percentage of the population below poverty by total state population. This number of people in poverty in each state is then multiplied by the proportion of the total state population divided by the total population of all states being analyzed. Once completed for each state these values are summed and then returned as an integer value to give the population-weighted average number of people in poverty in all the states provided in the list. 
 
 These values are computed from the US National Broadband Map API using the June 2014 dataset. 
 

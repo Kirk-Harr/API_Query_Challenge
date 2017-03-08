@@ -24,6 +24,26 @@ public class CensusDataController
      * @param args comma-delimited list of US States followed by 'CSV' for CSV output and 'averages' for the weighted-average income below poverty output.
      */
     public static void main( String[] args ) {
+        // Gather input from command line parameters.
+        CensusDataController ctl = new CensusDataController();
+        String[] states = args[0].split(",");
+        ArrayList<String> stateIds = new ArrayList<String>();
+        // Lookup all state FIPS IDs.
+        for (String s : states){
+            stateIds.add(ctl.StateIdLookup(s));
+        }
+        String[] stringArray = stateIds.toArray(new String[stateIds.size()]);
+        // Select output format.
+        if (args[1].equals("CSV")) {
+            ctl.StateCSVOutput(stringArray);
+        }
+        else if (args[1].equals("averages")) {
+            ctl.StateDataOutput(stringArray);
+        }
+        // Error if output format is invalid.
+        else {
+            System.out.println("Output format not recognized. The output options are \'CSV\' and \'averages\'.");
+        }
     }
 
     /**
@@ -32,7 +52,7 @@ public class CensusDataController
      * @param stateName the name of the state to lookup for it's US Census FIPS ID.
      * @return US Census FIPS ID for the state.
      */
-    private Integer StateIdLookup( String stateName ) {
+    private String StateIdLookup( String stateName ) {
         // URL of Census Data API with proper request options.
         String url = "https://www.broadbandmap.gov/broadbandmap/census/state/" + stateName + "?maxresults=1&all=false&format=json";
         // Get JSON output from request.
@@ -43,7 +63,7 @@ public class CensusDataController
         JSONArray stateDataArray = results.getJSONArray("state");
         JSONObject stateData = (JSONObject) stateDataArray.get(0);
         // Return just the FIPS ID.
-        return Integer.valueOf((String)stateData.get("fips"));
+        return (String)stateData.get("fips");
     }
 
     private static StringBuffer retrieveJSON (String url) {

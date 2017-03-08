@@ -6,7 +6,7 @@ The CensusDataController class is an API query tool to gather US Census data for
 This application is built using Maven, and once you have cloned the repository, you can build the application with the command:  
 `mvn clean package`  
 
-Once the application is built there will be an api-query-challenge.jar file in the target directory containing the application and any dependencies.
+Once the application is built there will be an api-query-challenge.jar file in the target directory containing the application and any dependencies.  
 #### Usage: ####  
 `java -cp <builtJarPackage> com.mindbeta.javachallenge.CensusDataController <commaDelimitedStateList> <outputFormat>`  
 
@@ -16,7 +16,7 @@ The two options for outputFormat are: CSV, averages
   
 * CSV output will provide all state demographic data in CSV format sorted alphabetically by state name.  
 Example: `<state name>, <population>, <households>, <income below poverty>, <median income>`
-* averages output will provide the weighted average of each state's population below the poverty line. 
+* averages output will provide the weighted average of each state's population below the poverty line.  
 #### Assumptions: ####
 Java version 8 was used for this project.
 
